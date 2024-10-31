@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
-  m_Name: New Village Effect
+  m_Name: VillageEff1
   m_EditorClassIdentifier: Assembly-CSharp::VillageEffect
-  effectName: 
-  effectDescription: 
+  effectName: Test1
+  effectDescription: "Testing\t"
   timing: 0
   trigger: 0
   villagerCost: 0
