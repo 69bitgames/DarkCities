@@ -39,70 +39,65 @@ public class Deck : MonoBehaviour
         ShuffleDeck();
         DrawInitialHand();
     }
+private void CreateGameDeck()
+{
+    gameDeck.Clear();
     
-    private void CreateGameDeck()
+    // Create a working copy of monster cards that we'll remove from as we use them
+    List<MonsterCard> availableMonsterCards = new List<MonsterCard>(monsterDeck);
+    
+    // Convert village cards to CardData and add to game deck
+    foreach (VillageCard villageCard in villageDeck)
     {
-        gameDeck.Clear();
+        CardData newCard = ScriptableObject.CreateInstance<CardData>();
+        newCard.cardName = villageCard.cardName;
+        newCard.cardArtwork = villageCard.cardArtwork;
+        newCard.cardTemplate = villageCard.cardTemplate;
+        newCard.isMonsterCard = false;
+        newCard.flavorText = villageCard.flavorText;
         
-        // Create a working copy of monster cards that we'll remove from as we use them
-        List<MonsterCard> availableMonsterCards = new List<MonsterCard>(monsterDeck);
-        
-        // Convert village cards to CardData and add to game deck
-        foreach (VillageCard villageCard in villageDeck)
-        {
-            CardData newCard = ScriptableObject.CreateInstance<CardData>();
-            newCard.cardName = villageCard.cardName;
-            newCard.cardArtwork = villageCard.cardArtwork;
-            newCard.cardTemplate = villageCard.cardTemplate;
-            newCard.isMonsterCard = false;
-            newCard.flavorText = villageCard.flavorText;
-            
-            // Convert effect descriptions to CardEffects (you'll need to implement this based on your effect system)
-            newCard.villageEffect = CreateEffectFromDescription(villageCard.villageEffectDescription);
-            newCard.attackEffect = CreateEffectFromDescription(villageCard.attackEffectDescription);
-            
-            gameDeck.Add(newCard);
-        }
-        
-        // Add monster effects to village cards
-        foreach (CardData card in gameDeck)
-        {
-            if (!card.isMonsterCard && availableMonsterCards.Count > 0)
-            {
-                // Randomly select a monster card
-                int randomIndex = Random.Range(0, availableMonsterCards.Count);
-                MonsterCard randomMonsterCard = availableMonsterCards[randomIndex];
-                
-                // Assign the monster effect
-                card.monsterEffectArtwork = randomMonsterCard.monsterArtwork;
-                card.monsterEffect = CreateEffectFromDescription(randomMonsterCard.monsterEffectDescription);
-                
-                // Remove the used monster card from the available pool
-                availableMonsterCards.RemoveAt(randomIndex);
-                
-                Debug.Log($"Assigned {randomMonsterCard.monsterName}'s effect to {card.cardName}. " +
-                         $"Remaining monster effects: {availableMonsterCards.Count}");
-            }
-            else if (!card.isMonsterCard && availableMonsterCards.Count == 0)
-            {
-                Debug.LogWarning("Ran out of monster effects to assign! Some village cards may not have monster effects.");
-            }
-        }
-        
-        Debug.Log($"Game deck created with {gameDeck.Count} cards");
+        // Now we're explicitly requesting the correct type
+        newCard.villageEffect = villageCard.villageEffect as VillageEffect;
+        newCard.attackEffect = villageCard.attackEffect as AttackEffect;
+        int index = Random.Range(0, availableMonsterCards.Count);
+        Debug.Log(availableMonsterCards[index].monsterEffect.EffectDescription);
+        newCard.monsterEffect = availableMonsterCards[index].monsterEffect as MonsterEffect;
+        availableMonsterCards.RemoveAt(index);
+        gameDeck.Add(newCard);
     }
-    
+}
     // Temporary method to create CardEffect from description
     // This will need to be replaced with proper effect creation based on your effect system
-    private CardEffect CreateEffectFromDescription(string description)
+private T CreateEffectFromDescription<T>(string description) where T : CardEffect
+{
+    if (string.IsNullOrEmpty(description)) return null;
+    
+    // Create the appropriate effect type based on the type parameter
+    T effect = null;
+    
+    if (typeof(T) == typeof(VillageEffect))
     {
-        if (string.IsNullOrEmpty(description)) return null;
-        
-        CardEffect effect = ScriptableObject.CreateInstance<CardEffect>();
-        effect.effectDescription = description;
-        return effect;
+        Debug.Log("Creating Village Effect");
+        Debug.Log(effect);
+        effect = ScriptableObject.CreateInstance<VillageEffect>() as T;
+        Debug.Log(effect);
+    }
+    else if (typeof(T) == typeof(AttackEffect))
+    {
+        effect = ScriptableObject.CreateInstance<AttackEffect>() as T;
+    }
+    else if (typeof(T) == typeof(MonsterEffect))
+    {
+        effect = ScriptableObject.CreateInstance<MonsterEffect>() as T;
+    }
+    else
+    {
+        effect = ScriptableObject.CreateInstance<SimpleEffect>() as T;
     }
     
+    effect?.Initialize();
+    return effect;
+} 
     private void ShuffleDeck()
     {
         int n = gameDeck.Count;

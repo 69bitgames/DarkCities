@@ -5,25 +5,30 @@ using TMPro;
 public class Card : MonoBehaviour
 {
     [Header("Card Visual Elements")]
-    [SerializeField] private Image cardArtworkImage;
-    [SerializeField] private Image monsterEffectArtworkImage;
-    [SerializeField] private TextMeshProUGUI cardNameText;
+    [SerializeField] public Image cardArtworkImage;
+    [SerializeField] public Image monsterEffectImage;
+    [SerializeField] public Image cardBackground;
+    [SerializeField] public TextMeshProUGUI cardNameText;
     
     [Header("Effect Text Elements")]
-    [SerializeField] private TextMeshProUGUI villageEffectText;
-    [SerializeField] private TextMeshProUGUI attackEffectText;
-    [SerializeField] private TextMeshProUGUI monsterEffectText;
+    [SerializeField] public TextMeshProUGUI villageEffectText;
+    [SerializeField] public TextMeshProUGUI attackEffectText;
+    [SerializeField] public TextMeshProUGUI monsterEffectText;
     
     [Header("Game State")]
     [SerializeField] private GameState gameState;
+
+    [SerializeField] private GameObject cardSelectCanvas;
+
+
+    public CardData cardData;
     
-    private CardData cardData;
-    
-    public void InitializeCard(CardData data)
+    public void InitializeCard(CardData data, GameState state = null)
     {
         cardData = data;
+        if (state != null) gameState = state;
+        
         UpdateVisuals();
-        UpdateEffectTexts();
     }
     
     private void UpdateVisuals()
@@ -38,19 +43,48 @@ public class Card : MonoBehaviour
         if (cardArtworkImage != null)
         {
             cardArtworkImage.sprite = cardData.cardArtwork;
+            cardArtworkImage.enabled = cardData.cardArtwork != null;
         }
         
-        // Update monster effect artwork if it exists
-        if (monsterEffectArtworkImage != null)
+        // Update monster effect artwork
+        if (monsterEffectImage != null)
         {
-            monsterEffectArtworkImage.sprite = cardData.monsterEffectArtwork;
-            monsterEffectArtworkImage.gameObject.SetActive(cardData.monsterEffectArtwork != null);
+            Debug.Log("MonsEf");
+            monsterEffectImage.sprite = cardData.monsterEffectArtwork;
+            monsterEffectImage.enabled = cardData.monsterEffectArtwork != null;
+        }
+
+        // Update card background if it exists
+        if (cardBackground != null)
+        {
+            cardBackground.sprite = cardData.cardTemplate;
+            cardBackground.enabled = cardData.cardTemplate != null;
         }
         
         // Update card name
         if (cardNameText != null)
         {
             cardNameText.text = cardData.cardName;
+        }
+        
+        // Update effect texts
+        UpdateEffectTexts();
+    }
+
+    public void OpenSelectCanvas(){
+        cardSelectCanvas = GameObject.Find("FixMe");
+        foreach (Transform child in cardSelectCanvas.transform)
+        {
+            child.gameObject.SetActive(true);
+        }
+        CardSelectScript cardSelectScript = cardSelectCanvas.GetComponent<CardSelectScript>();
+        if (cardSelectScript != null)
+        {
+            Debug.Log("Card Data Before Initialize");
+            Debug.Log(this.cardData.cardName);
+            Debug.Log(this.cardData.villageEffect.EffectDescription);
+
+            cardSelectScript.Initialize(this);
         }
     }
     
@@ -59,19 +93,26 @@ public class Card : MonoBehaviour
         // Update village effect text
         if (villageEffectText != null)
         {
-            villageEffectText.text = cardData.villageEffect?.effectDescription ?? "No effect";
+            villageEffectText.text = cardData.HasVillageEffect 
+                ? cardData.villageEffect.EffectDescription 
+                : "No village effect";
         }
         
         // Update attack effect text
         if (attackEffectText != null)
         {
-            attackEffectText.text = cardData.attackEffect?.effectDescription ?? "No effect";
+            attackEffectText.text = cardData.HasAttackEffect 
+                ? cardData.attackEffect.EffectDescription 
+                : "No attack effect";
         }
         
+        Debug.Log(cardData);
         // Update monster effect text
         if (monsterEffectText != null)
         {
-            monsterEffectText.text = cardData.monsterEffect?.effectDescription ?? "No effect";
+            monsterEffectText.text = cardData.HasMonsterEffect 
+                ? cardData.monsterEffect.EffectDescription 
+                : "No monster effect";
         }
     }
     

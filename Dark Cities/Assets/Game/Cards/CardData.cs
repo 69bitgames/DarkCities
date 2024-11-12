@@ -15,9 +15,9 @@ public class CardData : ScriptableObject
     public bool isMonsterCard;
     
     [Header("Effects")]
-    public CardEffect villageEffect;
-    public CardEffect attackEffect;
-    public CardEffect monsterEffect;
+public VillageEffect villageEffect;
+public AttackEffect attackEffect;
+public MonsterEffect monsterEffect;
     
     [Header("Text Display")]
     [TextArea(2,4)]

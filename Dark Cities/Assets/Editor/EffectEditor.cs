@@ -1,41 +1,13 @@
-using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(CardEffect), true)]
-public class CardEffectEditor : Editor
+[CustomEditor(typeof(CardEffect))]
+public class CardEffectEditor : BaseEffectEditor
 {
-    public override void OnInspectorGUI()
+    protected override void DrawChildProperties()
     {
-        serializedObject.Update();
-        
-        EditorGUILayout.LabelField("Effect Information", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("effectName"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("effectDescription"));
-        
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Timing", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("timing"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("trigger"));
-        
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Requirements", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("villagerCost"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("requiresMonsterAscended"));
-        
-        EditorGUILayout.Space();
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("requiresConstruction"));
-        
-        if (serializedObject.FindProperty("requiresConstruction").boolValue)
-        {
-            EditorGUI.indentLevel++;
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("constructionType"));
-            EditorGUI.indentLevel--;
-        }
-        
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Components", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("_componentsList"));
-        
-        serializedObject.ApplyModifiedProperties();
+        EditorGUILayout.LabelField("Card Effect Properties", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("isHidden"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("targetRequired"));
     }
 }
