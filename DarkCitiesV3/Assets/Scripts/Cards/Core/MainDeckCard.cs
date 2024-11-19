@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 
 [CreateAssetMenu(fileName = "New Main Deck Card", menuName = "Card Game/Cards/Main Deck Card")]
-public class MainDeckCard : BaseCard
+public partial class MainDeckCard : BaseCard
 {
     [SerializeField] private MonsterCard monsterCard;
     [SerializeField] private VillageCard villageCard;
@@ -40,5 +40,16 @@ public class MainDeckCard : BaseCard
         {
             Debug.LogWarning($"Village card is missing on {cardName}");
         }
+    }
+}
+
+public partial class MainDeckCard
+{
+    public void InitializeCard(MonsterCard monster, VillageCard village)
+    {
+        monsterCard = monster;
+        villageCard = village;
+        cardName = $"{monster.Name} + {village.Name}";
+        cardImage = monster.Image; // Or some combination of both images
     }
 }

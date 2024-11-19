@@ -69,8 +69,10 @@ public class UICard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, 
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log($"Clicked card: {cardData.Name}");
-        ShowDetailPopup();
+        if (cardData is MainDeckCard mainDeckCard)
+        {            
+            CardDetailPopup.Instance.ShowCard(mainDeckCard);
+        }
     }
 
     private IEnumerator FadeNameContainer(float targetAlpha)
